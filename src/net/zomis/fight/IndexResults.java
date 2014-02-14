@@ -4,16 +4,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * The results for when a fighter is at a specific index
+ */
 public class IndexResults<PL> {
 	private final Map<PL, WinsLosses> results = new HashMap<PL, WinsLosses>();
 	
-	void informAbout(PL opponent, boolean win) {
+	void informAbout(PL opponent, Boolean winner) {
 		WinsLosses winLoss = results.get(opponent);
 		if (winLoss == null) {
 			winLoss = new WinsLosses();
 			results.put(opponent, winLoss);
 		}
-		if (win)
+		if (winner == null) {
+			winLoss.draw();
+		}
+		else if (winner)
 			winLoss.win();
 		else winLoss.loss();
 	}

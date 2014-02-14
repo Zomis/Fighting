@@ -27,7 +27,12 @@ public class PlayerResults<PL> implements Comparable<PlayerResults<PL>> {
 	
 	void addResult(int myIndex, PL opponent, PL winner) {
 		IndexResults<PL> result = GuavaExt.mapGetOrPut(results, myIndex, producer);
-		result.informAbout(opponent, winner == this.player);
+		Boolean winStatus = null;
+		if (winner == this.player) // allow for drawed games as winner = null.
+			winStatus = true;
+		else if (winner != null)
+			winStatus = false;
+		result.informAbout(opponent, winStatus);
 	}
 	
 	public String toStringMultiLine() {
@@ -50,13 +55,14 @@ public class PlayerResults<PL> implements Comparable<PlayerResults<PL>> {
 	public WinsLosses calcTotal() {
 		int wins = 0;
 		int losses = 0;
-		
+		int draws = 0;
 		for (Entry<Integer, IndexResults<PL>> ee : results.entrySet()) {
 			WinsLosses tot = ee.getValue().calcTotal();
 			wins += tot.getWins();
+			draws = tot.getDraws();
 			losses += tot.getLosses();
 		}
-		return new WinsLosses(wins, losses);
+		return new WinsLosses(wins, losses, draws);
 	}
 	
 	public double calculatePercentage() {
