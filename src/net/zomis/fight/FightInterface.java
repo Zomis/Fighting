@@ -3,7 +3,7 @@ package net.zomis.fight;
 /**
  * Interface to provide implementation for determining the winner of a fight
  */
-public interface FightInterface<PL> {
+public interface FightInterface<T> {
 	/**
 	 * The fight number for the first fight
 	 */
@@ -16,5 +16,5 @@ public interface FightInterface<PL> {
 	 * @param fightNumber Which fight number in the series this is, starting at 1.
 	 * @return The winner of the fight, or null if it is a draw
 	 */
-	PL determineWinner(PL[] players, int fightNumber);
+	T determineWinner(T[] players, int fightNumber);
 }

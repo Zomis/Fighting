@@ -7,10 +7,10 @@ import java.util.Map.Entry;
 /**
  * The results for when a fighter is at a specific index
  */
-public class IndexResults<PL> {
-	private final Map<PL, WinsLosses> results = new HashMap<PL, WinsLosses>();
+public class IndexResults<T> {
+	private final Map<T, WinsLosses> results = new HashMap<T, WinsLosses>();
 	
-	void informAbout(PL opponent, Boolean winner) {
+	void informAbout(T opponent, Boolean winner) {
 		WinsLosses winLoss = results.get(opponent);
 		if (winLoss == null) {
 			winLoss = new WinsLosses();
@@ -26,7 +26,7 @@ public class IndexResults<PL> {
 	
 	public String toStringMultiLine() {
 		StringBuilder str = new StringBuilder();
-		for (Entry<PL, WinsLosses> ee : results.entrySet()) {
+		for (Entry<T, WinsLosses> ee : results.entrySet()) {
 			str.append("vs. ");
 			str.append(ee.getKey());
 			str.append(": ");

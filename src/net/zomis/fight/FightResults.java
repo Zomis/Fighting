@@ -13,8 +13,8 @@ import java.util.TreeSet;
 
 import com.google.common.base.Function;
 
-public class FightResults<PL> {
-	private final Map<PL, PlayerResults<PL>> playerData = new HashMap<PL, PlayerResults<PL>>();
+public class FightResults<T> {
+	private final Map<T, PlayerResults<T>> playerData = new HashMap<T, PlayerResults<T>>();
 	private final boolean	separateIndexes;
 	private final String label;
 	private final long timeStart;
@@ -29,8 +29,8 @@ public class FightResults<PL> {
 	/**
 	 * @return A list of all the player results, with the worst performing player first and the best player last.
 	 */
-	public List<PlayerResults<PL>> getResultsAsc() {
-		List<PlayerResults<PL>> list = new ArrayList<PlayerResults<PL>>(playerData.values());
+	public List<PlayerResults<T>> getResultsAsc() {
+		List<PlayerResults<T>> list = new ArrayList<PlayerResults<T>>(playerData.values());
 		Collections.sort(list);
 		return list;
 	}
@@ -38,9 +38,9 @@ public class FightResults<PL> {
 	/**
 	 * @return An ordered {@link LinkedHashMap} ranking all fighters with their associated win percentage with the best performing player first
 	 */
-	public LinkedHashMap<PL, Double> getPercentagesDesc() {
-		LinkedHashMap<PL, Double> result = new LinkedHashMap<PL, Double>();
-		for (Entry<PL, PlayerResults<PL>> ee : entriesSortedByValues(playerData, true)) {
+	public LinkedHashMap<T, Double> getPercentagesDesc() {
+		LinkedHashMap<T, Double> result = new LinkedHashMap<T, Double>();
+		for (Entry<T, PlayerResults<T>> ee : entriesSortedByValues(playerData, true)) {
 			result.put(ee.getKey(), ee.getValue().calcTotal().getPercentage());
 		}
 		return result;
@@ -57,12 +57,12 @@ public class FightResults<PL> {
 		this.timeEnd = System.nanoTime();
 	}
 	
-	private final ProduceValue<PL> prodValue = new ProduceValue<PL>();
-	public void saveResult(PL[] fighters, PL winner) {
+	private final ProduceValue<T> prodValue = new ProduceValue<T>();
+	public void saveResult(T[] fighters, T winner) {
 		final int DEFAULT_INDEX = 0;
 		for (int i = 0; i < fighters.length; i++) {
-			PL pp1 = fighters[i];
-			PlayerResults<PL> result = GuavaExt.mapGetOrPut(playerData, pp1, prodValue);
+			T pp1 = fighters[i];
+			PlayerResults<T> result = GuavaExt.mapGetOrPut(playerData, pp1, prodValue);
 			
 			for (int j = 0; j < fighters.length; j++) {
 				if (i == j)
@@ -89,7 +89,7 @@ public class FightResults<PL> {
 		}
 		str.append(super.toString());
 		str.append("\n");
-		for (Entry<PL, PlayerResults<PL>> ee : entriesSortedByValues(playerData, false)) {
+		for (Entry<T, PlayerResults<T>> ee : entriesSortedByValues(playerData, false)) {
 			str.append(ee.getKey());
 			str.append("\n");
 			str.append(ee.getValue().toStringMultiLine());

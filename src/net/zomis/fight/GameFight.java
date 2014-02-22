@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class GameFight<PL> {
+public class GameFight<T> {
 	
 	private final boolean	separateIndexes;
 	private String	label;
@@ -33,12 +33,13 @@ public class GameFight<PL> {
 	 * @param fightStrategy An interface providing implementation to determine the winner of a fight
 	 * @return The results of the fighting
 	 */
-	public FightResults<PL> fightEvenly(PL[] fighters, int gamesPerGroup, FightInterface<PL> fightStrategy) {
-		FightResults<PL> results = new FightResults<PL>(label, separateIndexes);
+	public FightResults<T> fightEvenly(T[] fighters, int gamesPerGroup, FightInterface<T> fightStrategy) {
+		FightResults<T> results = new FightResults<T>(label, separateIndexes);
+		// TODO: Change PL[] to List instead, or even better: Use a custom type, with specific getFirstFighter() getSecondFighter() isFirstFight() getFightNumber()
 		
-		List<List<PL>> groups = GuavaExt.processSubsets(Arrays.asList(fighters), 2);
-		for (List<PL> group : groups) {
-			PL[] currentFighters = Arrays.copyOf(fighters, 2);
+		List<List<T>> groups = GuavaExt.processSubsets(Arrays.asList(fighters), 2);
+		for (List<T> group : groups) {
+			T[] currentFighters = Arrays.copyOf(fighters, 2);
 			currentFighters[0] = group.get(0);
 			currentFighters[1] = group.get(1);
 			if (currentFighters[0] == currentFighters[1])
@@ -66,12 +67,12 @@ public class GameFight<PL> {
 	 * @param fightStrategy An interface providing implementation to determine the winner of a fight
 	 * @return The results of the fighting
 	 */
-	public FightResults<PL> fightRandom(PL[] fighters, int count, FightInterface<PL> fightStrategy) {
-		FightResults<PL> results = new FightResults<PL>(label, separateIndexes);
+	public FightResults<T> fightRandom(T[] fighters, int count, FightInterface<T> fightStrategy) {
+		FightResults<T> results = new FightResults<T>(label, separateIndexes);
 		Random random = new Random();
 		for (int i = 1; i <= count; i++) {
-			PL[] currentFighters = Arrays.copyOf(fighters, 2);
-			List<PL> playerOptions = new ArrayList<PL>(Arrays.asList(fighters));
+			T[] currentFighters = Arrays.copyOf(fighters, 2);
+			List<T> playerOptions = new ArrayList<T>(Arrays.asList(fighters));
 			currentFighters[0] = playerOptions.remove(random.nextInt(playerOptions.size()));
 			currentFighters[1] = playerOptions.remove(random.nextInt(playerOptions.size()));
 			if (currentFighters[0] == currentFighters[1])

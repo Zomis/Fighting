@@ -6,27 +6,27 @@ import java.util.Map.Entry;
 
 import com.google.common.base.Function;
 
-public class PlayerResults<PL> implements Comparable<PlayerResults<PL>> {
-	private final PL player;
+public class PlayerResults<T> implements Comparable<PlayerResults<T>> {
+	private final T player;
 
-	public PL getPlayer() {
+	public T getPlayer() {
 		return player;
 	}
-	PlayerResults(PL player) {
+	PlayerResults(T player) {
 		this.player = player;
 	}
 
-	private final Map<Integer, IndexResults<PL>> results = new HashMap<Integer, IndexResults<PL>>();
+	private final Map<Integer, IndexResults<T>> results = new HashMap<Integer, IndexResults<T>>();
 
-	private final Function<Integer, IndexResults<PL>> producer = new Function<Integer, IndexResults<PL>>() {
+	private final Function<Integer, IndexResults<T>> producer = new Function<Integer, IndexResults<T>>() {
 		@Override
-		public IndexResults<PL> apply(Integer arg0) {
-			return new IndexResults<PL>();
+		public IndexResults<T> apply(Integer arg0) {
+			return new IndexResults<T>();
 		}
 	};
 	
-	void addResult(int myIndex, PL opponent, PL winner) {
-		IndexResults<PL> result = GuavaExt.mapGetOrPut(results, myIndex, producer);
+	void addResult(int myIndex, T opponent, T winner) {
+		IndexResults<T> result = GuavaExt.mapGetOrPut(results, myIndex, producer);
 		Boolean winStatus = null;
 		if (winner == this.player) // allow for drawed games as winner = null.
 			winStatus = true;
@@ -37,7 +37,7 @@ public class PlayerResults<PL> implements Comparable<PlayerResults<PL>> {
 	
 	public String toStringMultiLine() {
 		StringBuilder str = new StringBuilder();
-		for (Entry<Integer, IndexResults<PL>> ee : results.entrySet()) {
+		for (Entry<Integer, IndexResults<T>> ee : results.entrySet()) {
 			str.append("as index ");
 			str.append(ee.getKey());
 			str.append(": (");
@@ -56,7 +56,7 @@ public class PlayerResults<PL> implements Comparable<PlayerResults<PL>> {
 		int wins = 0;
 		int losses = 0;
 		int draws = 0;
-		for (Entry<Integer, IndexResults<PL>> ee : results.entrySet()) {
+		for (Entry<Integer, IndexResults<T>> ee : results.entrySet()) {
 			WinsLosses tot = ee.getValue().calcTotal();
 			wins += tot.getWins();
 			draws = tot.getDraws();
@@ -70,7 +70,7 @@ public class PlayerResults<PL> implements Comparable<PlayerResults<PL>> {
 	}
 	
 	@Override
-	public int compareTo(PlayerResults<PL> o) {
+	public int compareTo(PlayerResults<T> o) {
 		return Double.compare(this.calculatePercentage(), o.calculatePercentage());
 	}
 }
