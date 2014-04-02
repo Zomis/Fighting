@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collector;
 
-public class FightIndexer<A> {
+public class FightIndexer<P, A> {
 
-	private final List<Indexer<A>> indexes;
-	private final List<Collector<? extends Fight<?, A>, ?, ?>> collectors;
+	private final List<Indexer<Fight<P, A>>> indexes;
+	private final List<Collector<? extends Fight<P, A>, ?, ?>> collectors;
 	private final List<String> keys;
 	
 	public FightIndexer() {
@@ -16,17 +16,17 @@ public class FightIndexer<A> {
 		this.keys = new ArrayList<>();
 	}
 	// TODO: Factory / Builder pattern, use unmodifiable collections
-	public List<Indexer<A>> getIndexers() {
+	public List<Indexer<Fight<P, A>>> getIndexers() {
 		return indexes;
 	}
-	public List<Collector<? extends Fight<?, A>, ?, ?>> getCollectors() {
+	public List<Collector<? extends Fight<P, A>, ?, ?>> getCollectors() {
 		return collectors;
 	}
 	public List<String> getKeys() {
 		return keys;
 	}
 	
-	public FightIndexer<A> addIndex(String key, Indexer<A> index) {
+	public FightIndexer<P, A> addIndex(String key, Indexer<Fight<P, A>> index) {
 		this.indexes.add(index);
 		this.collectors.add(null);
 		this.keys.add(key);
@@ -34,7 +34,7 @@ public class FightIndexer<A> {
 	}
 	
 //	Collector<T, A, R> result;
-	public <R, B, C> FightIndexer<A> addData(String key, Collector<? extends Fight<?, A>, ?, ?> collector) {
+	public <R, B, C> FightIndexer<P, A> addData(String key, Collector<? extends Fight<P, A>, ?, ?> collector) {
 //		Collectors.averagingInt(arg0)
 //		Collectors.maxBy(arg0)
 //		Collectors.counting()

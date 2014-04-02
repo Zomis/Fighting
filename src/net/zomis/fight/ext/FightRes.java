@@ -14,11 +14,6 @@ public class FightRes<P, A> {
 	private final IndexResults data;
 	private final String label;
 	
-	@Deprecated
-	public FightRes() {
-		this("No label");
-	}
-	
 	public FightRes(String label) {
 		this.data = new IndexResults();
 		this.index = new ConcurrentHashMap<>();
@@ -26,10 +21,10 @@ public class FightRes<P, A> {
 	}
 
 
-	public void addFight(Fight<P, A> fight, FightIndexer<A> fightIndexer) {
+	public void addFight(Fight<P, A> fight, FightIndexer<P, A> fightIndexer) {
 		
-		List<Collector<? extends Fight<?, A>, ?, ?>> collectors = fightIndexer.getCollectors();
-		List<Indexer<A>> indexers = fightIndexer.getIndexers();
+		List<Collector<? extends Fight<P, A>, ?, ?>> collectors = fightIndexer.getCollectors();
+		List<Indexer<Fight<P, A>>> indexers = fightIndexer.getIndexers();
 		List<String> keys = fightIndexer.getKeys();
 		// TODO: Is it really useful to add data anywhere except on last FightRes? It's going to use a Collector to cascade upwards either way!
 		
@@ -37,13 +32,16 @@ public class FightRes<P, A> {
 		whereToAddData.add(this);
 		FightRes<P, A> nextDepth = this;
 		for (int i = 0; i < indexers.size(); i++) {
-			Indexer<A> indexer = indexers.get(i);
+			Indexer<Fight<P, A>> indexer = indexers.get(i);
 			Collector<? extends Fight<?, A>, ?, ?> collector = collectors.get(i);
 			String key = keys.get(i);
 			
 			if (collector == null) {
 				// Is index
-				Object useIndex = indexer.apply(fight.getArena());
+				Object useIndex = indexer.apply(fight);
+				if (useIndex instanceof Object[]) {
+					
+				}
 				nextDepth = nextDepth.index.computeIfAbsent(useIndex, (f) -> new FightRes<>(key));
 				whereToAddData.add(nextDepth);
 			}
@@ -51,7 +49,7 @@ public class FightRes<P, A> {
 				// Is data
 //				Object value = indexer.apply(fight.getArena());
 				for (FightRes<P, A> where : whereToAddData) {
-					where.data.addData(key, fight, indexer, collector);
+					where.data.addData(key, fight, collector);
 				}
 			}
 		}
