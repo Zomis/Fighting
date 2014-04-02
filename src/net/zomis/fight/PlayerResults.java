@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.common.base.Function;
-
 public class PlayerResults<T> implements Comparable<PlayerResults<T>> {
 	private final T player;
 
@@ -18,15 +16,8 @@ public class PlayerResults<T> implements Comparable<PlayerResults<T>> {
 
 	private final Map<Integer, IndexResults<T>> results = new HashMap<Integer, IndexResults<T>>();
 
-	private final Function<Integer, IndexResults<T>> producer = new Function<Integer, IndexResults<T>>() {
-		@Override
-		public IndexResults<T> apply(Integer arg0) {
-			return new IndexResults<T>();
-		}
-	};
-	
 	void addResult(int myIndex, T opponent, T winner) {
-		IndexResults<T> result = GuavaExt.mapGetOrPut(results, myIndex, producer);
+		IndexResults<T> result = results.computeIfAbsent(myIndex, i -> new IndexResults<T>());
 		Boolean winStatus = null;
 		if (winner == this.player) // allow for drawed games as winner = null.
 			winStatus = true;

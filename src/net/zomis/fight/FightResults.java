@@ -11,8 +11,6 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.google.common.base.Function;
-
 public class FightResults<T> {
 	private final Map<T, PlayerResults<T>> playerData = new HashMap<T, PlayerResults<T>>();
 	private final boolean	separateIndexes;
@@ -46,25 +44,18 @@ public class FightResults<T> {
 		return result;
 	}
 
-	private static class ProduceValue<PL> implements Function<PL, PlayerResults<PL>> {
-		@Override
-		public PlayerResults<PL> apply(PL arg0) {
-			return new PlayerResults<PL>(arg0);
-		}
-	}
-	
 	void finished() {
 		this.timeEnd = System.nanoTime();
 	}
 	
-	private final ProduceValue<T> prodValue = new ProduceValue<T>();
 	public void saveResult(T[] fighters, T winner) {
 		final int DEFAULT_INDEX = 0;
 		for (int i = 0; i < fighters.length; i++) {
 			T pp1 = fighters[i];
-			PlayerResults<T> result = GuavaExt.mapGetOrPut(playerData, pp1, prodValue);
 			
-			for (int j = 0; j < fighters.length; j++) {
+			PlayerResults<T> result = playerData.computeIfAbsent(pp1, pl -> new PlayerResults<T>(pl));
+			
+			for (int j = 0; j < fighters.length; j++) { // loop to add both wins and losses for players
 				if (i == j)
 					continue;
 				

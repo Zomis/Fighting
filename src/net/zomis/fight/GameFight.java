@@ -43,7 +43,7 @@ public class GameFight<T> {
 			currentFighters[0] = group.get(0);
 			currentFighters[1] = group.get(1);
 			if (currentFighters[0] == currentFighters[1])
-				throw new IllegalStateException("Fighters cannot be equal at the moment");
+				throw new UnsupportedOperationException("Fighters cannot be equal at the moment");
 			
 			// Fight the games
 			for (int i = 1; i <= gamesPerGroup; i++)

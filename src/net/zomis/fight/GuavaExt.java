@@ -1,26 +1,13 @@
 package net.zomis.fight;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 /**
  * Utility methods that make a lot of usage of Guava.
  */
 public class GuavaExt {
-	public static <K, V> V mapGetOrPut(Map<K, V> map, K key, Function<K, V> valueProducer) {
-		if (map.containsKey(key))
-			return map.get(key);
-		
-		V value = valueProducer.apply(key);
-		map.put(key, value);
-		return value;
-	}
 	
 	/**
 	 * Creates a list of all subsets containing the specified number of elements
@@ -33,8 +20,8 @@ public class GuavaExt {
 		if (subsetSize > set.size()) {
 			subsetSize = set.size();
 		}
-		List<List<T>> result = Lists.newArrayList();
-		List<T> subset = Lists.newArrayListWithCapacity(subsetSize);
+		List<List<T>> result = new ArrayList<>();
+		List<T> subset = new ArrayList<>(subsetSize);
 		for (int i = 0; i < subsetSize; i++) {
 			subset.add(null);
 		}
@@ -43,7 +30,7 @@ public class GuavaExt {
 
 	private static <T> List<List<T>> processLargerSubsets(List<List<T>> result, List<T> set, List<T> subset, int subsetSize, int nextIndex) {
 		if (subsetSize == subset.size()) {
-			result.add(ImmutableList.copyOf(subset));
+			result.add(Collections.unmodifiableList(new ArrayList<>(subset)));
 		} else {
 			for (int j = nextIndex; j < set.size(); j++) {
 				subset.set(subsetSize, set.get(j));
@@ -53,8 +40,8 @@ public class GuavaExt {
 		return result;
 	}
 
-	public static <T> Collection<List<T>> permutations(List<T> list, int size) {
-		Collection<List<T>> all = Lists.newArrayList();
+/*	public static <T> Collection<List<T>> permutations(List<T> list, int size) {
+		Collection<List<T>> all = new ArrayList<>();
 		if (list.size() < size) {
 			size = list.size();
 		}
@@ -66,5 +53,5 @@ public class GuavaExt {
 			}
 		}
 		return all;
-	}
+	}*/
 }

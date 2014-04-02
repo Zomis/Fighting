@@ -11,11 +11,7 @@ public class IndexResults<T> {
 	private final Map<T, WinsLosses> results = new HashMap<T, WinsLosses>();
 	
 	void informAbout(T opponent, Boolean winner) {
-		WinsLosses winLoss = results.get(opponent);
-		if (winLoss == null) {
-			winLoss = new WinsLosses();
-			results.put(opponent, winLoss);
-		}
+		WinsLosses winLoss = results.computeIfAbsent(opponent, fn -> new WinsLosses());
 		if (winner == null) {
 			winLoss.draw();
 		}
