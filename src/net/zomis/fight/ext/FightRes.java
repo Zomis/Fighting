@@ -9,9 +9,11 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 public class FightRes<T> {
+	// TODO: FightRes to JTree conversion?
 
 	private final Map<Object, FightRes<T>> index;
 	private final IndexResults data;
@@ -36,11 +38,7 @@ public class FightRes<T> {
 
 	public void addFight(T fight, FightIndexer<T> fightIndexer) {
 		
-		List<Collector<T, ?, ?>> collectors = fightIndexer.getCollectors();
-		List<Collector<FNode<T>, ?, ?>> nodelectors = fightIndexer.getNodelectors();
-		List<Indexer<T>> indexers = fightIndexer.getIndexers();
-		List<Indexer<FNode<T>>> nodexers = fightIndexer.getNodexes();
-		List<String> keys = fightIndexer.getKeys();
+		Map<String, FightResHandler<T>> handlers = fightIndexer.getHandlers();
 		// It **is** actually useful to add data anywhere, even if it is not on last FightRes.
 		
 		Map<FNode<T>, FightRes<T>> whereToAddData = new HashMap<>();
@@ -50,89 +48,44 @@ public class FightRes<T> {
 		whereToAddData.put(rootNode, this);
 		nextDepths.add(rootNode);
 		
-		for (int i = 0; i < indexers.size(); i++) {
-			// Is it an index? Create a new FNode
-			// Is it 
-			
-			
-			Indexer<T> indexer = indexers.get(i);
-			Collector<T, ?, ?> collector = collectors.get(i);
-			String key = keys.get(i);
-			Collector<FNode<T>, ?, ?> nodelector = nodelectors.get(i);
-			Indexer<FNode<T>> nodex = nodexers.get(i);
+		for (Entry<String, FightResHandler<T>> ee : handlers.entrySet()) {
+			String key = ee.getKey();
+			FightResHandler<T> handler = ee.getValue();
 			
 			Function<Object, FightRes<T>> suppl = f -> new FightRes<>(key + f);
 			
-			if (nodex != null) {
+			if (handler.isIndexer()) {
 				
+				Function<FNode<T>, Object> nodex = handler.getIndexer();
 				List<FNode<T>> oldDepths = new ArrayList<>(nextDepths);
-				oldDepths.stream().forEach((previousDepth) -> {
+				oldDepths.stream().forEach(previousDepth -> {
 					nextDepths.remove(previousDepth);
-					Object useIndex = nodex.apply(previousDepth);
-					FightRes<T> newD = whereToAddData.get(previousDepth).index.computeIfAbsent(useIndex, useIndexValue -> suppl.apply(useIndexValue));
-					List<Object> idx = previousDepth.getChosenIndexes();
-					idx.add(useIndex);
-					FNode<T> newNode = new FNode<>(idx, fight);
-					nextDepths.add(newNode);
-					whereToAddData.put(newNode, newD);
-				});
-				
-				
-//				Object useIndex = nodex.apply(all fnodes in nextDepths);
-//				add "branch" method
-			}
-			else if (nodelector != null) {
-				for (Entry<FNode<T>, FightRes<T>> where : whereToAddData.entrySet()) {
-					where.getValue().data.addAdvancedData(key, fight, nodelector, where.getKey());
-				}
-			}
-			else if (indexer != null) {
-				// Is index
-				Object useIndex = indexer.apply(fight);
-				
-				if (useIndex instanceof Object[]) {
-					Object[] objArr = (Object[]) useIndex;
 					
-					List<FNode<T>> oldDepths = new ArrayList<>(nextDepths);
-					oldDepths.stream().forEach((previousDepth) -> {
-						nextDepths.remove(previousDepth);
-						
-						for (Object obj : objArr) {
-							FightRes<T> newD = whereToAddData.get(previousDepth).index.computeIfAbsent(obj, useIndexValue -> suppl.apply(useIndexValue));
-							List<Object> idx = previousDepth.getChosenIndexes();
-							idx.add(obj);
-							FNode<T> newNode = new FNode<>(idx, fight);
-							nextDepths.add(newNode);
-							whereToAddData.put(newNode, newD);
-						}
-					});
-				}
-				else {
-					// Only one index was returned
-					List<FNode<T>> oldDepths = new ArrayList<>(nextDepths);
-					oldDepths.stream().forEach((previousDepth) -> {
-						nextDepths.remove(previousDepth);
-						FightRes<T> newD = whereToAddData.get(previousDepth).index.computeIfAbsent(useIndex, useIndexValue -> suppl.apply(useIndexValue));
+					Object useIndex = nodex.apply(previousDepth);
+					if (!(useIndex instanceof Object[])) {
+						useIndex = new Object[]{ useIndex };
+					}
+					
+					Object[] objArr = (Object[]) useIndex;
+					for (Object obj : objArr) {
+						FightRes<T> newD = whereToAddData.get(previousDepth).index.computeIfAbsent(obj, useIndexValue -> suppl.apply(useIndexValue));
 						List<Object> idx = previousDepth.getChosenIndexes();
-						idx.add(useIndex);
+						idx.add(obj);
 						FNode<T> newNode = new FNode<>(idx, fight);
 						nextDepths.add(newNode);
 						whereToAddData.put(newNode, newD);
-					});
-				}
+					}
+				});
+			}
+			if (handler.isCollector()) {
+				Collector<FNode<T>, ?, ?> coll = handler.getCollector();
 				
-//				nextDepth = nextDepth.index.computeIfAbsent(useIndex, (f) -> new FightRes<>(key));
-//				whereToAddData.add(nextDepth);
-			}
-			else if (collector != null) {
-//				System.out.println("" + whereToAddData);
-				// Is data
-//				Object value = indexer.apply(fight.getArena());
 				for (Entry<FNode<T>, FightRes<T>> where : whereToAddData.entrySet()) {
-					where.getValue().data.addData(key, fight, collector);
+					where.getValue().data.addAdvancedData(key, coll, where.getKey());
 				}
 			}
-			else throw new AssertionError("Key " + key + " is nuts");
+			if (!handler.isCollector() && !handler.isIndexer())
+				throw new AssertionError("Key " + key + " is nuts");
 		}
 		
 	}
@@ -143,16 +96,15 @@ public class FightRes<T> {
 	}
 	
 	public String toStringBig() {
-		return toString(0);
+		return label + toString(0);
 	}
 	
 	public String toString(int indentation) {
 		String indent = indentStr(indentation);
 		StringBuilder str = new StringBuilder();
+		str.append("\n");
 		str.append(indent);
-		if (indentation == 0)
-			str.append(label);
-		str.append(" Data: ");
+		str.append("    Data: ");
 		str.append(data);
 		str.append("\n");
 		
@@ -161,7 +113,6 @@ public class FightRes<T> {
 			str.append(indent);
 			str.append(ee.getValue().label);
 			str.append(": ");
-			str.append(ee.getKey());
 			str.append(ee.getValue().toString(indentation + 4));
 		}
 		

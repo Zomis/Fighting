@@ -1,6 +1,8 @@
 package net.zomis.fight.ext;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -10,37 +12,22 @@ import net.zomis.fight.GuavaExt;
 
 public class GameFightNew<P, A> {
 
-	private final String name;
-	private final Function<ArenaParams<P>, A> arenaCreator;
-
-	@Deprecated
-	public GameFightNew(String name) {
-		this.name = name;
-		this.arenaCreator = null;
-	}
-	public GameFightNew(String name, Function<ArenaParams<P>, A> arenaCreator) {
-		this.name = name;
-		this.arenaCreator = arenaCreator;
-	}
-
-	// TODO: Use Stream.flatMap to transform a stream of the 1-vs-1 player combinations into a stream of game fights?
-	
-	public Stream<Fight<P, A>> createEvenFights(List<P> players, int numFights) {
+	public Stream<Fight<P, A>> createEvenFights(List<P> players, int numFights, Function<ArenaParams<P>, A> arenaCreator) {
 		if (players.size() != 2)
 			throw new UnsupportedOperationException();
 		
-		return Stream.generate(generator(players)).limit(numFights);
+		return Stream.generate(fightGenerator(players, arenaCreator)).limit(numFights);
 	}
 
-	private Supplier<Fight<P, A>> generator(List<P> players) {
+	private Supplier<Fight<P, A>> fightGenerator(List<P> players, Function<ArenaParams<P>, A> arenaCreator) {
 		ArenaParams<P> arenaParams = new ArenaParams<P>(players);
 		return () -> new Fight<P, A>(arenaParams, arenaCreator.apply(arenaParams));
 	}
 	
 	
-	public Stream<Fight<P, A>> createEvenFightStream(List<P> ais, int numFights) {
+	public Stream<Fight<P, A>> createEvenFightStream(List<P> ais, int numFights, Function<ArenaParams<P>, A> arenaCreator) {
 		Stream<ArenaParams<P>> arenas = createArenaStream(ais);
-		Stream<Fight<P, A>> fightStream = arenas.flatMap(a -> createEvenFights(a.getPlayers(), numFights));
+		Stream<Fight<P, A>> fightStream = arenas.flatMap(a -> createEvenFights(a.getPlayers(), numFights, arenaCreator));
 		return fightStream;
 	}
 	
@@ -50,8 +37,8 @@ public class GameFightNew<P, A> {
 		return arenas;
 	}
 	
-	public FightRes<Fight<P, A>> processStream(Stream<Fight<P, A>> fightStream, FightIndexer<Fight<P, A>> indexer, Consumer<Fight<P, A>> process) {
-		FightRes<Fight<P, A>> results = new FightRes<>(name);
+	public <T> FightRes<T> processStream(String name, Stream<T> fightStream, FightIndexer<T> indexer, Consumer<T> process) {
+		FightRes<T> results = new FightRes<>(name);
 		fightStream.forEach(fight -> {
 			process.accept(fight);
 			results.addFight(fight, indexer);
@@ -60,6 +47,41 @@ public class GameFightNew<P, A> {
 		return results;
 	}
 	
+	public Stream<Fight<P, A>> produceRandomStream(List<P> fighters, Function<ArenaParams<P>, A> arenaCreator) {
+		return Stream.generate(() -> fightGenerateRandom(new Random(), fighters, arenaCreator));
+	}
+	
+	private Fight<P, A> fightGenerateRandom(Random random, List<P> fighters, Function<ArenaParams<P>, A> arenaCreator) {
+		List<P> currentFighters = new ArrayList<>();
+		List<P> playerOptions = new ArrayList<P>(fighters);
+		currentFighters.add(playerOptions.remove(random.nextInt(playerOptions.size())));
+		currentFighters.add(playerOptions.remove(random.nextInt(playerOptions.size())));
+		
+		return fightGenerator(currentFighters, arenaCreator).get();
+	}
+
+	public FightRes<Fight<P, A>> fightRandom(String name, List<P> fighters, 
+			int count, FightIndexer<Fight<P, A>> indexer, 
+			Function<ArenaParams<P>, A> arenaCreator,
+			Consumer<Fight<P, A>> process) {
+		FightRes<Fight<P, A>> results = new FightRes<Fight<P, A>>(name);
+		Random random = new Random();
+		
+		for (int i = 1; i <= count; i++) {
+			List<P> currentFighters = new ArrayList<>();
+			List<P> playerOptions = new ArrayList<P>(fighters);
+			currentFighters.add(playerOptions.remove(random.nextInt(playerOptions.size())));
+			currentFighters.add(playerOptions.remove(random.nextInt(playerOptions.size())));
+			
+			Stream<Fight<P, A>> fights = createEvenFights(currentFighters, 1, arenaCreator);
+			fights.forEach(fight -> {
+				process.accept(fight);
+				results.addFight(fight, indexer);
+			});
+		}
+		results.finish();
+		return results;
+	}
 	
 	
 }

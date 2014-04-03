@@ -13,11 +13,13 @@ public class WinsLosses {
 	public WinsLosses() {
 		this(0, 0, 0);
 	}
+	
 	public WinsLosses(int wins, int losses, int draws) {
 		this.wins = wins;
 		this.losses = losses;
 		this.draws = draws;
 	}
+	
 	public WinsLosses(Collection<WinsLosses> total) {
 		this(0, 0, 0);
 		for (WinsLosses winlose : total) {

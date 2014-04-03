@@ -8,7 +8,7 @@ import java.util.Random;
 public class GameFight<T> {
 	
 	private final boolean	separateIndexes;
-	private String	label;
+	private final String	label;
 	
 	/**
 	 * @param label The name of this fight, which will be showed in the output

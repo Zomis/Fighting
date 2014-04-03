@@ -24,16 +24,8 @@ public class IndexResults {
 		return values.toString();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <A, B, C> void addData(String strkey, Object param, Collector<A, B, C> collector) {
-		Collector<Object, Object, Object> mytcoll = (Collector<Object, Object, Object>) collector;
-		Object handler = values.computeIfAbsent(strkey, (a) -> mytcoll.supplier().get());
-		coll.put(strkey, collector);
-		BiConsumer<Object, Object> accum = mytcoll.accumulator();
-		accum.accept(handler, param);
-	}
-	
-	public <A, B, C> void addAdvancedData(String strkey, Object param, Collector<FNode<A>, B, C> collector, FNode<A> node) {
+	public <A, B, C> void addAdvancedData(String strkey, Collector<FNode<A>, B, C> collector, FNode<A> node) {
+		@SuppressWarnings("unchecked")
 		Collector<FNode<A>, Object, Object> mytcoll = (Collector<FNode<A>, Object, Object>) collector;
 		Object handler = values.computeIfAbsent(strkey, (a) -> mytcoll.supplier().get());
 		coll.put(strkey, collector);

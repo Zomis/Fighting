@@ -1,78 +1,53 @@
 package net.zomis.fight.ext;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class FightIndexer<T> {
-	// TODO: Make this class even more flexible by using FightIndexer<T>, where T can be Fight<P, A>
 
-	private final List<Indexer<T>> indexes;
-	private final List<Indexer<FNode<T>>> nodexes;
-	private final List<Collector<T, ?, ?>> collectors;
-	private final List<Collector<FNode<T>, ?, ?>> nodelectors;
-	private final List<String> keys;
+	private final Map<String, FightResHandler<T>> handlers;
 	
 	public FightIndexer() {
-		this.indexes = new ArrayList<>();
-		this.collectors = new ArrayList<>();
-		this.keys = new ArrayList<>();
-		this.nodelectors = new ArrayList<>();
-		this.nodexes = new ArrayList<>();
+		this.handlers = new LinkedHashMap<>();
 	}
+	
+	public Map<String, FightResHandler<T>> getHandlers() {
+		return handlers;
+	}
+	
 	// TODO: Factory / Builder pattern, use unmodifiable collections
-	public List<Indexer<T>> getIndexers() {
-		return indexes;
-	}
-	public List<Collector<T, ?, ?>> getCollectors() {
-		return collectors;
-	}
-	public List<String> getKeys() {
-		return keys;
-	}
 	
-	public List<Collector<FNode<T>, ?, ?>> getNodelectors() {
-		return nodelectors;
-	}
-	
-	public FightIndexer<T> addIndex(String key, Indexer<T> index) {
-		if (keys.contains(key))
-			throw new IllegalArgumentException("Key has already been added: " + key);
-		this.indexes.add(index);
-		this.collectors.add(null);
-		this.keys.add(key);
-		this.nodelectors.add(null);
-		this.nodexes.add(null);
+	public FightIndexer<T> addIndex(final String key, final Indexer<T> index) {
+		checkKey(key);
+		this.handlers.put(key, new FightResHandler<>(f -> index.apply(f.getF()), null));
 		return this;
 	}
 	
-	public FightIndexer<T> addData(String key, Collector<T, ?, ?> collector) {
-		if (keys.contains(key))
+	private void checkKey(String key) {
+		if (handlers.containsKey(key))
 			throw new IllegalArgumentException("Key has already been added: " + key);
-		this.indexes.add(null);
-		this.collectors.add(collector);
-		this.keys.add(key);
-		this.nodelectors.add(null);
-		this.nodexes.add(null);
+	}
+
+	public FightIndexer<T> addData(String key, Collector<T, ?, ?> collector) {
+		checkKey(key);
+		Collector<FNode<T>, ?, ?> nodelector = Collectors.mapping(f -> f.getF(), collector);
+		this.handlers.put(key, new FightResHandler<>(null, nodelector));
 		return this;
 	}
 	
 	public void addDataAdvanced(String key, Collector<FNode<T>, ?, ?> collector) {
-		if (keys.contains(key))
-			throw new IllegalArgumentException("Key has already been added: " + key);
-		this.indexes.add(null);
-		this.collectors.add(null);
-		this.keys.add(key);
-		this.nodelectors.add(collector);
-		this.nodexes.add(null);
+		checkKey(key);
+		this.handlers.put(key, new FightResHandler<>(null, collector));
 	}
+	
 	public void addIndexPlus(String key, Indexer<FNode<T>> otherAI) {
-		this.indexes.add(null);
-		this.collectors.add(null);
-		this.keys.add(key);
-		this.nodelectors.add(null);
-		this.nodexes.add(otherAI);
+		checkKey(key);
+		this.handlers.put(key, new FightResHandler<>(otherAI, null));
 	}
+	
+	
 	
 	// x To save the data, create one object per fight?
 	// x How these advanced features could be used, see below:
@@ -123,7 +98,4 @@ Extra:
 		isWinMiddle: true - 3 wins, 1 draws, 6 losses (42,00 %) (4 haveBottomRight)
 		
 */	
-	public List<Indexer<FNode<T>>> getNodexes() {
-		return nodexes;
-	}
 }
