@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collector;
 
-public class FightIndexer<P, A> {
+public class FightIndexer<T> {
+	// TODO: Make this class even more flexible by using FightIndexer<T>, where T can be Fight<P, A>
 
-	private final List<Indexer<Fight<P, A>>> indexes;
-	private final List<Collector<? extends Fight<P, A>, ?, ?>> collectors;
+	private final List<Indexer<T>> indexes;
+	private final List<Collector<T, ?, ?>> collectors;
 	private final List<String> keys;
 	
 	public FightIndexer() {
@@ -16,29 +17,28 @@ public class FightIndexer<P, A> {
 		this.keys = new ArrayList<>();
 	}
 	// TODO: Factory / Builder pattern, use unmodifiable collections
-	public List<Indexer<Fight<P, A>>> getIndexers() {
+	public List<Indexer<T>> getIndexers() {
 		return indexes;
 	}
-	public List<Collector<? extends Fight<P, A>, ?, ?>> getCollectors() {
+	public List<Collector<T, ?, ?>> getCollectors() {
 		return collectors;
 	}
 	public List<String> getKeys() {
 		return keys;
 	}
 	
-	public FightIndexer<P, A> addIndex(String key, Indexer<Fight<P, A>> index) {
+	public FightIndexer<T> addIndex(String key, Indexer<T> index) {
+		if (keys.contains(key))
+			throw new IllegalArgumentException("Key has already been added: " + key);
 		this.indexes.add(index);
 		this.collectors.add(null);
 		this.keys.add(key);
 		return this;
 	}
 	
-//	Collector<T, A, R> result;
-	public <R, B, C> FightIndexer<P, A> addData(String key, Collector<? extends Fight<P, A>, ?, ?> collector) {
-//		Collectors.averagingInt(arg0)
-//		Collectors.maxBy(arg0)
-//		Collectors.counting()
-//		Collectors.summarizingInt(arg0)
+	public FightIndexer<T> addData(String key, Collector<T, ?, ?> collector) {
+		if (keys.contains(key))
+			throw new IllegalArgumentException("Key has already been added: " + key);
 		this.indexes.add(null);
 		this.collectors.add(collector);
 		this.keys.add(key);

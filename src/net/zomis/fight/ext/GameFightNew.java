@@ -52,8 +52,8 @@ public class GameFightNew<P, A> {
 		return arenas;
 	}
 	
-	public FightRes<P, A> processStream(Stream<Fight<P, A>> fightStream, FightIndexer<P, A> indexer, Consumer<Fight<P, A>> process) {
-		FightRes<P, A> results = new FightRes<>(name);
+	public FightRes<Fight<P, A>> processStream(Stream<Fight<P, A>> fightStream, FightIndexer<Fight<P, A>> indexer, Consumer<Fight<P, A>> process) {
+		FightRes<Fight<P, A>> results = new FightRes<>(name);
 		fightStream.forEach(fight -> {
 			process.accept(fight);
 			results.addFight(fight, indexer);

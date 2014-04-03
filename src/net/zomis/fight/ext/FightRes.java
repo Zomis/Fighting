@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collector;
 
 
-public class FightRes<P, A> {
+public class FightRes<T> {
 
-	private final Map<Object, FightRes<P, A>> index;
+	private final Map<Object, FightRes<T>> index;
 	private final IndexResults data;
 	private final String label;
 	
@@ -20,35 +21,73 @@ public class FightRes<P, A> {
 		this.label = label;
 	}
 
+	public boolean hasChilds() {
+		return !index.isEmpty();
+	}
+	
+	public IndexResults getData() {
+		return data;
+	}
+	
+	
+	
 
-	public void addFight(Fight<P, A> fight, FightIndexer<P, A> fightIndexer) {
+	public void addFight(T fight, FightIndexer<T> fightIndexer) {
 		
-		List<Collector<? extends Fight<P, A>, ?, ?>> collectors = fightIndexer.getCollectors();
-		List<Indexer<Fight<P, A>>> indexers = fightIndexer.getIndexers();
+		List<Collector<T, ?, ?>> collectors = fightIndexer.getCollectors();
+		List<Indexer<T>> indexers = fightIndexer.getIndexers();
 		List<String> keys = fightIndexer.getKeys();
-		// TODO: Is it really useful to add data anywhere except on last FightRes? It's going to use a Collector to cascade upwards either way!
+		// It **is** actually useful to add data anywhere, even if it is not on last FightRes.
 		
-		List<FightRes<P, A>> whereToAddData = new ArrayList<>();
+		List<FightRes<T>> whereToAddData = new ArrayList<>();
+		List<FightRes<T>> nextDepths = new ArrayList<>();
 		whereToAddData.add(this);
-		FightRes<P, A> nextDepth = this;
+		nextDepths.add(this);
+		
+//		FightRes<P, A> nextDepth = this;
 		for (int i = 0; i < indexers.size(); i++) {
-			Indexer<Fight<P, A>> indexer = indexers.get(i);
-			Collector<? extends Fight<?, A>, ?, ?> collector = collectors.get(i);
+			Indexer<T> indexer = indexers.get(i);
+			Collector<T, ?, ?> collector = collectors.get(i);
 			String key = keys.get(i);
 			
 			if (collector == null) {
 				// Is index
 				Object useIndex = indexer.apply(fight);
+				Function<Object, FightRes<T>> suppl = f -> new FightRes<>(key + f);
+				
 				if (useIndex instanceof Object[]) {
+					Object[] objArr = (Object[]) useIndex;
+//					System.out.println("We have an array! " + Arrays.toString(objArr));
 					
+					List<FightRes<T>> oldDepths = new ArrayList<>(nextDepths);
+					oldDepths.stream().forEach((previousDepth) -> {
+						nextDepths.remove(previousDepth);
+						
+						for (Object obj : objArr) {
+							FightRes<T> newD = previousDepth.index.computeIfAbsent(obj, useIndexValue -> suppl.apply(useIndexValue));
+							nextDepths.add(newD);
+							whereToAddData.add(newD);
+						}
+					});
 				}
-				nextDepth = nextDepth.index.computeIfAbsent(useIndex, (f) -> new FightRes<>(key));
-				whereToAddData.add(nextDepth);
+				else {
+					List<FightRes<T>> oldDepths = new ArrayList<>(nextDepths);
+					oldDepths.stream().forEach((previousDepth) -> {
+						nextDepths.remove(previousDepth);
+						FightRes<T> newD = previousDepth.index.computeIfAbsent(useIndex, useIndexValue -> suppl.apply(useIndexValue));
+						nextDepths.add(newD);
+						whereToAddData.add(newD);
+					});
+				}
+				
+//				nextDepth = nextDepth.index.computeIfAbsent(useIndex, (f) -> new FightRes<>(key));
+//				whereToAddData.add(nextDepth);
 			}
 			else {
+//				System.out.println("" + whereToAddData);
 				// Is data
 //				Object value = indexer.apply(fight.getArena());
-				for (FightRes<P, A> where : whereToAddData) {
+				for (FightRes<T> where : whereToAddData) {
 					where.data.addData(key, fight, collector);
 				}
 			}
@@ -58,6 +97,11 @@ public class FightRes<P, A> {
 	
 	@Override
 	public String toString() {
+		return "FightRes:" + this.label;
+//		return toString(0);
+	}
+	
+	public String toStringBig() {
 		return toString(0);
 	}
 	
@@ -75,7 +119,7 @@ public class FightRes<P, A> {
 //			str.append("Index Keys: " + index.keySet() + "\n");
 		}
 		
-		for (Entry<Object, FightRes<P, A>> ee : index.entrySet()) {
+		for (Entry<Object, FightRes<T>> ee : index.entrySet()) {
 			indent = indentStr(indentation + 4);
 			str.append(indent);
 			str.append(ee.getValue().label);

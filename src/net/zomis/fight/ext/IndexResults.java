@@ -30,11 +30,7 @@ public class IndexResults {
 		Object handler = values.computeIfAbsent(strkey, (a) -> mytcoll.supplier().get());
 		coll.put(strkey, collector);
 		BiConsumer<Object, Object> accum = mytcoll.accumulator();
-//		Collectors.
-		
 		accum.accept(handler, param);
-		
-//		collector.finisher()
 	}
 	
 	public void finish() {
