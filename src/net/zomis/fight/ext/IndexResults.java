@@ -33,6 +33,15 @@ public class IndexResults {
 		accum.accept(handler, param);
 	}
 	
+	public <A, B, C> void addAdvancedData(String strkey, Object param, Collector<FNode<A>, B, C> collector, FNode<A> node) {
+		Collector<FNode<A>, Object, Object> mytcoll = (Collector<FNode<A>, Object, Object>) collector;
+		Object handler = values.computeIfAbsent(strkey, (a) -> mytcoll.supplier().get());
+		coll.put(strkey, collector);
+		BiConsumer<Object, FNode<A>> accum = mytcoll.accumulator();
+		accum.accept(handler, node);
+	}
+	
+	
 	public void finish() {
 		for (Entry<String, Collector<?, ?, ?>> ee : coll.entrySet()) {
 			Collector<?, ?, ?> collector = ee.getValue();

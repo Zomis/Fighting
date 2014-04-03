@@ -40,9 +40,7 @@ public class GameFightNew<P, A> {
 	
 	public Stream<Fight<P, A>> createEvenFightStream(List<P> ais, int numFights) {
 		Stream<ArenaParams<P>> arenas = createArenaStream(ais);
-//		FightStream fights = f;
 		Stream<Fight<P, A>> fightStream = arenas.flatMap(a -> createEvenFights(a.getPlayers(), numFights));
-//		Stream.concat(arg0, arg1)
 		return fightStream;
 	}
 	

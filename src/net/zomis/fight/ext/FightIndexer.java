@@ -8,13 +8,17 @@ public class FightIndexer<T> {
 	// TODO: Make this class even more flexible by using FightIndexer<T>, where T can be Fight<P, A>
 
 	private final List<Indexer<T>> indexes;
+	private final List<Indexer<FNode<T>>> nodexes;
 	private final List<Collector<T, ?, ?>> collectors;
+	private final List<Collector<FNode<T>, ?, ?>> nodelectors;
 	private final List<String> keys;
 	
 	public FightIndexer() {
 		this.indexes = new ArrayList<>();
 		this.collectors = new ArrayList<>();
 		this.keys = new ArrayList<>();
+		this.nodelectors = new ArrayList<>();
+		this.nodexes = new ArrayList<>();
 	}
 	// TODO: Factory / Builder pattern, use unmodifiable collections
 	public List<Indexer<T>> getIndexers() {
@@ -27,12 +31,18 @@ public class FightIndexer<T> {
 		return keys;
 	}
 	
+	public List<Collector<FNode<T>, ?, ?>> getNodelectors() {
+		return nodelectors;
+	}
+	
 	public FightIndexer<T> addIndex(String key, Indexer<T> index) {
 		if (keys.contains(key))
 			throw new IllegalArgumentException("Key has already been added: " + key);
 		this.indexes.add(index);
 		this.collectors.add(null);
 		this.keys.add(key);
+		this.nodelectors.add(null);
+		this.nodexes.add(null);
 		return this;
 	}
 	
@@ -42,10 +52,27 @@ public class FightIndexer<T> {
 		this.indexes.add(null);
 		this.collectors.add(collector);
 		this.keys.add(key);
+		this.nodelectors.add(null);
+		this.nodexes.add(null);
 		return this;
 	}
-	// TODO: Use FightInformation interface? for firstPlayer, secondPlayer, isFirstFight, getFightIterationNumber...
-	// x Add ExtraInformation data, such as "average length of fight"
+	
+	public void addDataAdvanced(String key, Collector<FNode<T>, ?, ?> collector) {
+		if (keys.contains(key))
+			throw new IllegalArgumentException("Key has already been added: " + key);
+		this.indexes.add(null);
+		this.collectors.add(null);
+		this.keys.add(key);
+		this.nodelectors.add(collector);
+		this.nodexes.add(null);
+	}
+	public void addIndexPlus(String key, Indexer<FNode<T>> otherAI) {
+		this.indexes.add(null);
+		this.collectors.add(null);
+		this.keys.add(key);
+		this.nodelectors.add(null);
+		this.nodexes.add(otherAI);
+	}
 	
 	// x To save the data, create one object per fight?
 	// x How these advanced features could be used, see below:
@@ -96,4 +123,7 @@ Extra:
 		isWinMiddle: true - 3 wins, 1 draws, 6 losses (42,00 %) (4 haveBottomRight)
 		
 */	
+	public List<Indexer<FNode<T>>> getNodexes() {
+		return nodexes;
+	}
 }
