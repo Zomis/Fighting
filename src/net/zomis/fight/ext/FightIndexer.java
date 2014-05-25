@@ -67,7 +67,7 @@ public class FightIndexer<T> {
 	
 	// TODO: Use MFE Replay database as a stream (easy to fix with .map?)
 	// TODO: Use raw history strings as input stream (easy to fix with .map?)
-	// fightResults.indexBy(player).indexBy(otherPlayer).indexBy(firstMove).extraCount(wasBombUsed)
+	// Usage example: fightResults.indexBy(player).indexBy(otherPlayer).indexBy(firstMove).extraCount(wasBombUsed)
 	
 //	MFE - scan through replays to find out interesting information
 //	PL determineWinner(FightParams<PL> fightInfo);

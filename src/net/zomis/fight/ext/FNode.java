@@ -19,7 +19,7 @@ public class FNode<T> {
 	
 	public Object getIndex(int i) {
 		if (chosenIndexes.size() <= i)
-			throw new IllegalStateException();
+			throw new IllegalStateException("Index " + i + " has not been chosen yet");
 		return chosenIndexes.get(i);
 	}
 	

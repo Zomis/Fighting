@@ -12,7 +12,7 @@ import net.zomis.fight.GuavaExt;
 
 public class GameFightNew<P, A> {
 
-	public Stream<Fight<P, A>> createEvenFights(List<P> players, int numFights, Function<ArenaParams<P>, A> arenaCreator) {
+	private Stream<Fight<P, A>> create2pFights(List<P> players, int numFights, Function<ArenaParams<P>, A> arenaCreator) {
 		if (players.size() != 2)
 			throw new UnsupportedOperationException();
 		
@@ -27,7 +27,7 @@ public class GameFightNew<P, A> {
 	
 	public Stream<Fight<P, A>> createEvenFightStream(List<P> ais, int numFights, Function<ArenaParams<P>, A> arenaCreator) {
 		Stream<ArenaParams<P>> arenas = createArenaStream(ais);
-		Stream<Fight<P, A>> fightStream = arenas.flatMap(a -> createEvenFights(a.getPlayers(), numFights, arenaCreator));
+		Stream<Fight<P, A>> fightStream = arenas.flatMap(a -> create2pFights(a.getPlayers(), numFights, arenaCreator));
 		return fightStream;
 	}
 	
@@ -37,12 +37,9 @@ public class GameFightNew<P, A> {
 		return arenas;
 	}
 	
-	public <T> FightRes<T> processStream(String name, Stream<T> fightStream, FightIndexer<T> indexer, Consumer<T> process) {
+	public <T> FightRes<T> processStream(String name, Stream<T> fightStream, FightIndexer<T> indexer) {
 		FightRes<T> results = new FightRes<>(name);
-		fightStream.forEach(fight -> {
-			process.accept(fight);
-			results.addFight(fight, indexer);
-		});
+		fightStream.forEach(fight -> results.addFight(fight, indexer));
 		results.finish();
 		return results;
 	}
@@ -68,20 +65,12 @@ public class GameFightNew<P, A> {
 		Random random = new Random();
 		
 		for (int i = 1; i <= count; i++) {
-			List<P> currentFighters = new ArrayList<>();
-			List<P> playerOptions = new ArrayList<P>(fighters);
-			currentFighters.add(playerOptions.remove(random.nextInt(playerOptions.size())));
-			currentFighters.add(playerOptions.remove(random.nextInt(playerOptions.size())));
-			
-			Stream<Fight<P, A>> fights = createEvenFights(currentFighters, 1, arenaCreator);
-			fights.forEach(fight -> {
-				process.accept(fight);
-				results.addFight(fight, indexer);
-			});
+			Fight<P, A> fight = fightGenerateRandom(random, fighters, arenaCreator);
+			process.accept(fight);
+			results.addFight(fight, indexer);
 		}
 		results.finish();
 		return results;
 	}
-	
 	
 }

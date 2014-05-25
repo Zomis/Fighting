@@ -21,4 +21,20 @@ public enum WinResult {
 			return LOSS;
 		}
 	}
+	
+	public double winValue() {
+		switch (this) {
+			case DRAW:
+				return 0.0;
+			case LOSS:
+				return -1.0;
+			case WIN:
+				return 1.0;
+		}
+		throw new IllegalStateException("Unexpected value: " + this);
+	}
+
+	public WinResult reversed() {
+		return resultFor(this, LOSS, DRAW);
+	}
 }

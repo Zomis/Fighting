@@ -1,18 +1,12 @@
-package test.net.zomis.fight;
+package net.zomis.fight.example;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
 import java.util.Random;
 
 import net.zomis.fight.FightInterface;
 import net.zomis.fight.FightResults;
 import net.zomis.fight.GameFight;
-import net.zomis.fight.PlayerResults;
 
-import org.junit.Test;
-
-public class FightingTest {
+public class SimpleFight {
 	public static class Fighter {
 		private final int random;
 		private final int bonus;
@@ -33,8 +27,7 @@ public class FightingTest {
 		}
 	}
 	
-	@Test
-	public void test() {
+	public static void main(String[] args) {
 		final Random random = new Random(42); // since this is a test we want the results to be stable
 		
 		GameFight<Fighter> fight = new GameFight<Fighter>();
@@ -53,17 +46,6 @@ public class FightingTest {
 		});
 		System.out.println(results.toStringMultiLine());
 		System.out.println(results.getPercentagesDesc());
-		
-		List<PlayerResults<Fighter>> sortedResults = results.getResultsAsc();
-		assertEquals(1, sortedResults.get(0).getPlayer().random);
-		assertEquals(2, sortedResults.get(1).getPlayer().random);
-		assertEquals(4, sortedResults.get(2).getPlayer().random);
-		assertEquals(5, sortedResults.get(3).getPlayer().random);
-		assertEquals(6, sortedResults.get(4).getPlayer().random);
-		assertEquals(3, sortedResults.get(5).getPlayer().random);
-		assertEquals(2, sortedResults.get(5).getPlayer().bonus);
-		assertEquals(7, sortedResults.get(6).getPlayer().random);
-		assertEquals(8, sortedResults.get(7).getPlayer().random);
 	}
 	
 

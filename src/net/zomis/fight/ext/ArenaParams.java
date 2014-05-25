@@ -29,5 +29,9 @@ public class ArenaParams<T> {
 	public String toString() {
 		return getFirstPlayer() + " vs. " + getSecondPlayer();
 	}
+
+	public T getPlayer(int i) {
+		return getPlayers().get(i);
+	}
 	
 }
