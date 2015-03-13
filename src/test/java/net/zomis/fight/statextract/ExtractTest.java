@@ -7,7 +7,7 @@ import java.util.function.ToIntFunction;
 /**
  * Created by Simon on 3/12/2015.
  */
-public class ExtractExample {
+public class ExtractTest {
 
     public static class Example {
         ToIntFunction<String> length = str -> str.length();
