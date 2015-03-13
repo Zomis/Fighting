@@ -28,6 +28,10 @@ public class Extractor {
 
     public void post(Object object) {
         Extract extract = extractors.get(object.getClass());
+        if (extract == null) {
+            throw new RuntimeException("Unable to post " + object + " of class "
+                    + object.getClass() + ": No extract object available");
+        }
         extract.add(this, object);
     }
 
