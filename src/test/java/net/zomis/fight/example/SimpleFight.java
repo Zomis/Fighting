@@ -6,6 +6,8 @@ import net.zomis.fight.FightInterface;
 import net.zomis.fight.FightResults;
 import net.zomis.fight.GameFight;
 
+import org.junit.Test;
+
 public class SimpleFight {
 	public static class Fighter {
 		private final int random;
@@ -27,7 +29,8 @@ public class SimpleFight {
 		}
 	}
 	
-	public static void main(String[] args) {
+	@Test
+	public void main() {
 		final Random random = new Random(42); // since this is a test we want the results to be stable
 		
 		GameFight<Fighter> fight = new GameFight<Fighter>();

@@ -2,6 +2,7 @@ package net.zomis.fight.annot;
 
 import java.util.IntSummaryStatistics;
 import java.util.function.Function;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -28,13 +29,13 @@ public class ExampleFight {
 	private Collector<ExampleMove, ?, IntSummaryStatistics> someInterestingData = Collectors.summarizingInt(move -> 1);
 	
 	@Data(level = 3, value = "Removed Entities")
-	private Collector<RemovedEvent, ?, IntSummaryStatistics> dataAboutSpecificEvent = Collectors.summarizingInt(move -> 1);
+	private ToIntFunction<RemovedEvent> dataAboutSpecificEvent = move -> 1;
 	
 	@Index(level = 0, value = "Player")
-	private Function<ExampleMove, String> fds;
+	private Function<ExampleMove, String> player;
 	
 	@Index(level = 1, value = "Opponent")
-	private Indexer<Fight<ExampleFight, String>> fdsdsa;
+	private Indexer<Fight<ExampleFight, String>> opponent;
 	
 
 }
