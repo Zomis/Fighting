@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class Extractor {
 
     public void post(Object object) {
         Extract extract = extractors.get(object.getClass());
-        extract.add(object);
+        extract.add(this, object);
     }
 
     public static Extractor extractor(Object target) {
@@ -49,8 +50,12 @@ public class Extractor {
     }
 
     private void addExtractor(String name, Class<?> aClass, Collector<?, ?, ?> fieldValue) {
+        extractFor(aClass).addCollector(name, fieldValue);
+    }
+
+    private Extract extractFor(Class<?> aClass) {
         extractors.putIfAbsent(aClass, new Extract());
-        extractors.get(aClass).addCollector(name, fieldValue);
+        return extractors.get(aClass);
     }
 
     private static Class<?> genericType(Field field, int i) {
@@ -61,6 +66,10 @@ public class Extractor {
         ParameterizedType aType = (ParameterizedType) genericFieldType;
         Type[] fieldArgTypes = aType.getActualTypeArguments();
         return (Class<?>) fieldArgTypes[i];
+    }
+
+    public <T> void addPreHandler(Class<T> clazz, BiConsumer<Extractor, ? super T> preHandler) {
+        extractFor(clazz).addPreHandler(preHandler);
     }
 
 }
