@@ -15,6 +15,14 @@ public class ExtractExample {
         ToIntFunction<Character> charValue = ch -> ch.charValue();
     }
 
+    @Test(expected = StackOverflowError.class)
+    public void stackOverflow() {
+        Extractor extractor = Extractor.extractor(new Example());
+        extractor.addPreHandler(String.class, (extr, str) -> str.chars().mapToObj(i -> (char) i).forEach(ch -> extr.post(ch)));
+        extractor.addPreHandler(Character.class, (extr, ch) -> extr.post("--" + ch));
+        extractor.post("test");
+    }
+
     @Test
     public void test() {
         Extractor extractor = Extractor.extractor(new Example());
