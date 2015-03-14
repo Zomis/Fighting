@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
@@ -42,6 +43,7 @@ public class Extractor {
             Object fieldValue = null;
             try {
                 fieldValue = field.get(target);
+                Objects.requireNonNull(fieldValue, "Field cannot be null: " + field.getName());
                 if (field.getType() == ToIntFunction.class) {
                     extractor.addExtractor(field.getName(), genericType(field, 0),
                             Collectors.summarizingInt((ToIntFunction) fieldValue));
