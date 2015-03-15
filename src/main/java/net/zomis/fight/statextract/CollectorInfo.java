@@ -1,5 +1,6 @@
 package net.zomis.fight.statextract;
 
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 /**
@@ -10,9 +11,12 @@ public class CollectorInfo {
     private final String name;
     private final Object collectingObject;
     private final Collector<Object, Object, Object> collector;
+    private final Supplier<Collector<?, ?, ?>> collectorSupplier;
 
-    public CollectorInfo(String name, Collector<?, ?, ?> collector) {
+    public CollectorInfo(String name, Supplier<Collector<?, ?, ?>> supplier) {
         this.name = name;
+        this.collectorSupplier = supplier;
+        Collector<?, ?, ?> collector = supplier.get();
         this.collector = (Collector<Object, Object, Object>) collector;
         this.collectingObject = collector.supplier().get();
     }
@@ -29,4 +33,7 @@ public class CollectorInfo {
         return collector.finisher().apply(collectingObject);
     }
 
+    public CollectorInfo copy() {
+        return new CollectorInfo(name, collectorSupplier);
+    }
 }
