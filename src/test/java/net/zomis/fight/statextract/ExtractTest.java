@@ -52,7 +52,7 @@ public class ExtractTest {
         Extractor extractor = Extractor.extractor(new Example());
         // This below
         extractor.addPreHandler(String.class, (extr, str) -> str.chars().mapToObj(i -> (char) i).forEach(ch -> extr.post(ch)));
-        InstancePoster poster = extractor.postPrimary(null);
+        InstancePoster poster = extractor.postPrimary();
         poster.post("test");
         poster.post("Hello World");
         poster.post("yet another message");

@@ -25,7 +25,7 @@ public class TicTacExtractTest {
     public void playGame(Extractor extractor, TTAI playerX, TTAI playerO) {
         TTBase ttt = new TTFactories().classicMNK(3);
         TTClassicController controller = new TTClassicController(ttt);
-        Poster poster = extractor.postPrimary(controller);
+        Poster poster = extractor.postPrimary();
         while (!controller.isGameOver()) {
             TTAI ai = controller.getCurrentPlayer().is(TTPlayer.X) ? playerX : playerO;
             TTBase tile = ai.play(controller);

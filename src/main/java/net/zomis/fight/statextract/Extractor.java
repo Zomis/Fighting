@@ -84,9 +84,10 @@ public class Extractor implements Poster {
         extractFor(clazz).addPreHandler(preHandler);
     }
 
-    public InstancePoster postPrimary(Object key) {
-        InstancePoster poster = new InstancePoster(key, classExtractorMap);
+    public InstancePoster postPrimary() {
+        InstancePoster poster = new InstancePoster(classExtractorMap);
         posters.add(poster);
         return poster;
     }
+
 }

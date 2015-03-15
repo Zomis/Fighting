@@ -9,11 +9,9 @@ import java.util.stream.Collectors;
  */
 public class InstancePoster implements Poster {
 
-    private final Object key;
     private final Map<Class<?>, ClassExtractor> extractors;
 
-    public InstancePoster(Object key, Map<Class<?>, ClassExtractor> extractors) {
-        this.key = key;
+    public InstancePoster(Map<Class<?>, ClassExtractor> extractors) {
         this.extractors = new HashMap<>();
         for (Map.Entry<Class<?>, ClassExtractor> ee : extractors.entrySet()) {
             this.extractors.put(ee.getKey(), ee.getValue().copy());
