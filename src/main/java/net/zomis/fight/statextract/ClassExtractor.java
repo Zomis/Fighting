@@ -36,8 +36,8 @@ public class ClassExtractor {
         ClassExtractor copy = new ClassExtractor();
         for (CollectorInfo collectorInfo : collectors) {
             copy.collectors.add(collectorInfo.copy());
-            copy.preHandlers.addAll(preHandlers);
         }
+        copy.preHandlers.addAll(preHandlers);
         return copy;
     }
 

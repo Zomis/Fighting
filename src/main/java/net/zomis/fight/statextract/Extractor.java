@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Simon on 3/12/2015.
  */
-public class Extractor implements Poster {
+public class Extractor {
 
     private final Object target;
     private final Map<Class<?>, ClassExtractor> classExtractorMap = new HashMap<>();
@@ -23,23 +23,13 @@ public class Extractor implements Poster {
         this.target = target;
     }
 
+    @Deprecated
     public ExtractResults collect() {
         return new ExtractResults(classExtractorMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().finish())));
     }
 
     public IndexableResults collectIndexable() {
         return new IndexableResults(posters);
-    }
-
-    @Override
-    public Poster post(Object object) {
-        ClassExtractor extract = classExtractorMap.get(object.getClass());
-        if (extract == null) {
-            throw new RuntimeException("Unable to post " + object + " of class "
-                    + object.getClass() + ": No extract object available");
-        }
-        extract.add(this, object);
-        return this;
     }
 
     public static Extractor extractor(Object target) {

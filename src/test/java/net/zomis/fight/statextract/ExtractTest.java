@@ -25,7 +25,7 @@ public class ExtractTest {
         Extractor extractor = Extractor.extractor(new Example());
         extractor.addPreHandler(String.class, (extr, str) -> str.chars().mapToObj(i -> (char) i).forEach(ch -> extr.post(ch)));
         extractor.addPreHandler(Character.class, (extr, ch) -> extr.post("--" + ch));
-        extractor.post("test");
+        extractor.postPrimary().post("test");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ExtractTest {
         poster.post("Hello World");
         poster.post("yet another message");
         poster.post("a very long message that perhaps contains a bunch of a's");
-        ExtractResults data = extractor.collect();
+        ExtractResults data = poster.collect();
         System.out.println(data.getData());
         IntSummaryStatistics lengths = (IntSummaryStatistics) data.getData().get(String.class).get("length");
         assertEquals(4, lengths.getCount());

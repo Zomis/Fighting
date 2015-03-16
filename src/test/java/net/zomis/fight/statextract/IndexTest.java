@@ -18,20 +18,14 @@ public class IndexTest {
         ToIntFunction<String> numA = str -> (int) str.chars().filter(ch -> ch == 97).count();
     }
 
-    public static class Example {
-        ToIntFunction<String> length = str -> str.length();
-        ToIntFunction<String> numA = str -> (int) str.chars().filter(ch -> ch == 97).count();
-        ToIntFunction<Character> charValue = ch -> ch.charValue();
-    }
-
     @Test
     public void indexExample() {
         Extractor extractor = Extractor.extractor(new IndexExample());
-        extractor.post("teat");
-        extractor.post("a_a_");
-        extractor.post("tca");
-        extractor.post("abc");
-        extractor.post("aaa");
+        extractor.postPrimary().post("teat");
+        extractor.postPrimary().post("a_a_");
+        extractor.postPrimary().post("tca");
+        extractor.postPrimary().post("abc");
+        extractor.postPrimary().post("aaa");
 /*
 Unindexed: { length = 4+4+3+3+3, numA = 1+2+1+1+3 }
 size=3: { length = 3+3+3, numA = 1+1+3 }
@@ -46,6 +40,12 @@ size=4,firstLetter=t: { length = 4, numA = 1 }
 
         ExtractResults data = extractor.collect();
         System.out.println(data.getData());
+
+        IndexableResults results = extractor.collectIndexable();
+        for (ExtractResults ee : results.getResults()) {
+            System.out.println(ee.getData());
+        }
+        System.out.println(results.unindexed());
     }
 
 }
