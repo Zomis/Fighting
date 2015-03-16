@@ -14,6 +14,11 @@ public class ExtractResults {
         this.data = data;
     }
 
+    ExtractResults(Object obj, Map<String, Object> data) {
+        this.data = new HashMap<>();
+        this.data.put(void.class, data);
+    }
+
     public Map<Class<?>, Map<String, Object>> getData() {
         return new HashMap<>(data);
     }

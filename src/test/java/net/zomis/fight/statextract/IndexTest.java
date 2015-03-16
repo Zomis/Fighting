@@ -2,8 +2,13 @@ package net.zomis.fight.statextract;
 
 import org.junit.Test;
 
+import java.util.IntSummaryStatistics;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by Simon on 3/12/2015.
@@ -42,7 +47,20 @@ size=4,firstLetter=t: { length = 4, numA = 1 }
         for (ExtractResults ee : results.getResults()) {
             System.out.println(ee.getData());
         }
-        System.out.println(results.unindexed());
+        Map<Class<?>, Map<String, Object>> data = results.unindexed().getData();
+        System.out.println(data);
+        Map<String, Object> voidData = data.get(void.class);
+        IntSummaryStatistics numA = (IntSummaryStatistics) voidData.get("numA");
+        IntSummaryStatistics length = (IntSummaryStatistics) voidData.get("length");
+        assertEquals(5, numA.getCount());
+        assertEquals(8, numA.getSum());
+        assertEquals(1, numA.getMin());
+        assertEquals(3, numA.getMax());
+
+        assertEquals(5, length.getCount());
+        assertEquals(17, length.getSum());
+        assertEquals(3, length.getMin());
+        assertEquals(4, length.getMax());
     }
 
 }

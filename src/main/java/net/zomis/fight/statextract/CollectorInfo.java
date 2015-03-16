@@ -9,7 +9,7 @@ import java.util.stream.Collector;
 public class CollectorInfo {
 
     private final String name;
-    private final Object collectingObject;
+    private Object collectingObject;
     private final Collector<Object, Object, Object> collector;
     private final Supplier<Collector<?, ?, ?>> collectorSupplier;
 
@@ -23,6 +23,13 @@ public class CollectorInfo {
 
     public void accumulate(Object object) {
         this.collector.accumulator().accept(collectingObject, object);
+    }
+
+    CollectorInfo combine(CollectorInfo other) {
+        CollectorInfo copy = copy();
+        copy.collectingObject = copy.collector.combiner().apply(copy.collectingObject, other.collectingObject);
+        copy.collectingObject = copy.collector.combiner().apply(copy.collectingObject, this.collectingObject);
+        return copy;
     }
 
     public String getName() {

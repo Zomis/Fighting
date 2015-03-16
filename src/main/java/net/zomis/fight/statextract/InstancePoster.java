@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
  */
 public class InstancePoster implements Poster {
 
-    private final Map<Class<?>, ClassExtractor> extractors;
+    final Map<Class<?>, ClassExtractor> extractors;
 
     public InstancePoster(Map<Class<?>, ClassExtractor> extractors) {
         this.extractors = new HashMap<>();

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class ClassExtractor {
 
-    private final List<CollectorInfo> collectors = new ArrayList<>();
+    final List<CollectorInfo> collectors = new ArrayList<>();
     private final List<BiConsumer<Poster, Object>> preHandlers = new ArrayList<>();
 
     void add(Poster extractor, Object object) {
@@ -33,6 +33,7 @@ public class ClassExtractor {
     }
 
     ClassExtractor copy() {
+        // this is only called when creating a new InstancePoster, possibly rename this method somehow.
         ClassExtractor copy = new ClassExtractor();
         for (CollectorInfo collectorInfo : collectors) {
             copy.collectors.add(collectorInfo.copy());

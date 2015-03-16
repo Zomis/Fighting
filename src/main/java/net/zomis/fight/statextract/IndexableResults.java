@@ -1,6 +1,10 @@
 package net.zomis.fight.statextract;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -8,16 +12,36 @@ import java.util.stream.Collectors;
  */
 public class IndexableResults {
 
-    private final List<ExtractResults> results;
     private final List<InstancePoster> posters;
+    private final List<Map<String, CollectorInfo>> collectors;
 
     public IndexableResults(List<InstancePoster> posters) {
         this.posters = posters;
-        this.results = posters.stream().map(p -> p.collect()).collect(Collectors.toList());
+        this.collectors = new ArrayList<>();
+        for (InstancePoster poster : posters) {
+            Map<String, CollectorInfo> data = new HashMap<>();
+            for (Map.Entry<Class<?>, ClassExtractor> ee : poster.extractors.entrySet()) {
+                for (CollectorInfo coll : ee.getValue().collectors) {
+                    data.put(coll.getName(), coll);
+                }
+            }
+            collectors.add(data);
+        }
     }
 
     public ExtractResults unindexed() {
-        return null;
+        Map<String, Object> results = new HashMap<>();
+        Map<String, CollectorInfo> temp = new HashMap<>();
+        BiFunction<CollectorInfo, CollectorInfo, CollectorInfo> remapCollectors = (a, b) -> a.combine(b);
+        for (Map<String, CollectorInfo> instance : collectors) {
+            for (Map.Entry<String, CollectorInfo> ee : instance.entrySet()) {
+                temp.merge(ee.getKey(), ee.getValue(), remapCollectors);
+            }
+        }
+        for (Map.Entry<String, CollectorInfo> ee : temp.entrySet()) {
+            results.put(ee.getKey(), ee.getValue().finish());
+        }
+        return new ExtractResults(null, results);
     }
 
     public ExtractResults indexBy(String... fields) {
