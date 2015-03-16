@@ -23,11 +23,6 @@ public class Extractor {
         this.target = target;
     }
 
-    @Deprecated
-    public ExtractResults collect() {
-        return new ExtractResults(classExtractorMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().finish())));
-    }
-
     public IndexableResults collectIndexable() {
         return new IndexableResults(posters);
     }

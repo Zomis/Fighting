@@ -38,9 +38,6 @@ size=4,firstLetter=a: { length = 4, numA = 2 }
 size=4,firstLetter=t: { length = 4, numA = 1 }
 */
 
-        ExtractResults data = extractor.collect();
-        System.out.println(data.getData());
-
         IndexableResults results = extractor.collectIndexable();
         for (ExtractResults ee : results.getResults()) {
             System.out.println(ee.getData());
