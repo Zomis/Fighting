@@ -24,7 +24,21 @@ public class IndexTest {
     }
 
     @Test
-    public void indexExample() {
+    public void indexed() {
+        Extractor extractor = Extractor.extractor(new IndexExample());
+        extractor.postPrimary().post("teat");
+        extractor.postPrimary().post("aaaa");
+        extractor.postPrimary().post("af");
+        extractor.postPrimary().post("tt");
+
+        IndexableResults results = extractor.collectIndexable();
+        Map<Object, Object> data = results.indexBy("length");
+        System.out.println("INDEXED ----");
+        System.out.println(data);
+    }
+
+    @Test
+    public void unindexed() {
         Extractor extractor = Extractor.extractor(new IndexExample());
         extractor.postPrimary().post("teat");
         extractor.postPrimary().post("a_a_");
