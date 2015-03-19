@@ -26,8 +26,7 @@ public class InstancePoster implements Poster {
     public Poster post(Object object) {
         ClassExtractor extract = extractors.get(object.getClass());
         if (extract == null) {
-            throw new RuntimeException("Unable to post " + object + " of class "
-                    + object.getClass() + ": No extract object available");
+            return this;
         }
         extract.add(this, object);
         return this;
