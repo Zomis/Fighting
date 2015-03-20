@@ -1,5 +1,7 @@
 package net.zomis.fight.statextract;
 
+import net.zomis.fight.statextract.types.StatCollector;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +25,8 @@ public class ClassExtractor {
         }
     }
 
-    public void addCollector(String name, Supplier<Collector<?, ?, ?>> fieldValue) {
-        collectors.add(new CollectorInfo(name, fieldValue));
+    public void addCollector(String name, StatCollector statCollector, Supplier<Collector<?, ?, ?>> fieldValue) {
+        collectors.add(new CollectorInfo(name, statCollector, fieldValue));
     }
 
     public Map<String, Object> finish() {

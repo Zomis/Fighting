@@ -52,11 +52,8 @@ public class IndexableResults {
                 // if index is not last, put into a map of value-for-field, more-values
                 // if index is last, put the real actual values into the map
                 CollectorInfo indexCollector = instance.get(indexKey);
-                Object indexValue = indexCollector.finish();
+                Object indexValue = indexCollector.getIndexValue();
 
-                // the collector creates a special kind of object, extract the index value from this
-                IntSummaryStatistics value = (IntSummaryStatistics) indexValue;
-                indexValue = value.getSum();
                 if (index < fields.length - 1) {
                     throw new UnsupportedOperationException();
                 } else { // final part

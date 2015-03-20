@@ -1,5 +1,8 @@
 package net.zomis.fight.statextract;
 
+import net.zomis.fight.statextract.types.StatCollector;
+import net.zomis.fight.statextract.types.StatCollectors;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,15 +32,16 @@ public class Extractor {
 
     public static Extractor extractor(Object target) {
         Extractor extractor = new Extractor(target);
+        StatCollectors collectorTypes = new StatCollectors();
         for (Field field : target.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             final Object fieldValue;
             try {
                 fieldValue = field.get(target);
                 Objects.requireNonNull(fieldValue, "Field cannot be null: " + field.getName());
-                if (field.getType() == ToIntFunction.class) {
-                    extractor.addExtractor(field.getName(), genericType(field, 0),
-                            () -> Collectors.summarizingInt((ToIntFunction) fieldValue));
+                StatCollector statCollector = collectorTypes.get(field.getType());
+                if (statCollector != null) {
+                    extractor.addExtractor(field.getName(), statCollector.postedType(field), statCollector, () -> statCollector.createCollector(fieldValue));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -46,23 +50,13 @@ public class Extractor {
         return extractor;
     }
 
-    private void addExtractor(String name, Class<?> aClass, Supplier<Collector<?, ?, ?>> fieldValue) {
-        extractFor(aClass).addCollector(name, fieldValue);
+    private void addExtractor(String name, Class<?> aClass, StatCollector statCollector, Supplier<Collector<?, ?, ?>> fieldValue) {
+        extractFor(aClass).addCollector(name, statCollector, fieldValue);
     }
 
     private ClassExtractor extractFor(Class<?> aClass) {
         classExtractorMap.putIfAbsent(aClass, new ClassExtractor());
         return classExtractorMap.get(aClass);
-    }
-
-    private static Class<?> genericType(Field field, int i) {
-        Type genericFieldType = field.getGenericType();
-        if (!(genericFieldType instanceof ParameterizedType)) {
-            throw new IllegalArgumentException("Cannot deserialize a Map without generics types");
-        }
-        ParameterizedType aType = (ParameterizedType) genericFieldType;
-        Type[] fieldArgTypes = aType.getActualTypeArguments();
-        return (Class<?>) fieldArgTypes[i];
     }
 
     public <T> void addPreHandler(Class<T> clazz, BiConsumer<Poster, ? super T> preHandler) {

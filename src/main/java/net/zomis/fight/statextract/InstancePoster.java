@@ -32,9 +32,4 @@ public class InstancePoster implements Poster {
         return this;
     }
 
-    public InstancePoster combine(InstancePoster other) {
-
-        throw new UnsupportedOperationException();
-    }
-
 }
