@@ -28,7 +28,11 @@ pipeline {
 */
             }
         }
-        zreleaseMaven()
+        stage('Release check') {
+            steps {
+                zreleaseMaven()
+            }
+        }
     }
 
     post {
