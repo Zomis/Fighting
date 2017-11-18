@@ -12,7 +12,7 @@ import java.util.stream.Collector;
 
 
 public class FightRes<T> {
-	// TODO: FightRes to JTree conversion?
+	// TODO: Show results in some kind of tree?
 
 	private final Map<Object, FightRes<T>> index;
 	private final IndexResults data;

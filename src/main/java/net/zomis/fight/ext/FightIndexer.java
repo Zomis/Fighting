@@ -58,7 +58,7 @@ public class FightIndexer<T> {
 	 * CWars2 - average length of match
 	 * 
 	 * MFE - use starting move as an index to find best starting moves, no matter which AI did the move
-	 * MFE - find the average number of 100% mines in 100 games of A vs. B
+	 * MFE - find the average number of 100% mines in 100 games of A vs. B (Make analysis before/after each click and check how many new appeared)
 	 * 
 	 * TTTUltimate - Find out the best starting moves
 	 * TTTUltimate - Average length of match
