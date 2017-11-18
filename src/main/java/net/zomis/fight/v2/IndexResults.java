@@ -54,6 +54,7 @@ public class IndexResults {
             Object newValue = finisher.apply(value);
             values.put(ee.getKey(), newValue);
         }
+        this.children.values().forEach(IndexResults::finish);
     }
 
     void addRecursive(String valueName, Collector<Object, ?, ?> collector, List<Object> currentIndexes, List<Object> objects) {
