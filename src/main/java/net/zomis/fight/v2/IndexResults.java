@@ -89,11 +89,6 @@ public class IndexResults {
             str.append(valueSet.getValue());
             str.append(System.lineSeparator());
         }
-        if (!this.children.isEmpty()) {
-            indent(str);
-            str.append("Children:");
-            str.append(System.lineSeparator());
-        }
         for (Entry<Object, IndexResults> indexes : this.children.entrySet()) {
             indent(str);
             str.append(indexes.getKey());
