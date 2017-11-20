@@ -1,6 +1,7 @@
 package net.zomis.fight.ext;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -81,7 +82,7 @@ public class FightCollectors {
 
 			@Override
 			public Set<Collector.Characteristics> characteristics() {
-				return new HashSet<>(Arrays.asList(Characteristics.CONCURRENT, Characteristics.IDENTITY_FINISH));
+				return EnumSet.of(Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
 			}
 
 			@Override
