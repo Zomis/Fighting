@@ -14,18 +14,14 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'mvn clean test'
+                sh 'mvn clean package'
             }
         }
         stage('Results') {
             steps {
-                junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-/*
-                withSonarQubeEnv('My SonarQube Server') {
-                    // requires SonarQube Scanner for Maven 3.2+
-                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
+                withSonarQubeEnv('docker-sonar') {
+                    sh 'mvn sonar:sonar'
                 }
-*/
             }
         }
         stage('Release check') {
@@ -36,6 +32,9 @@ pipeline {
     }
 
     post {
+        always {
+            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+        }
         success {
             zpost(0)
         }
