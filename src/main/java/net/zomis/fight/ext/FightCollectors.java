@@ -30,13 +30,10 @@ public class FightCollectors {
 		return new Collector<A, B, C>() {
 			@Override
 			public BiConsumer<B, A> accumulator() {
-				return new BiConsumer<B, A>() {
-					@Override
-					public void accept(B arg0, A arg1) {
-						if (predicate.test(arg1))
-							collector.accumulator().accept(arg0, arg1);
-					}
-				};
+				return (arg0, arg1) -> {
+                    if (predicate.test(arg1))
+                        collector.accumulator().accept(arg0, arg1);
+                };
 			}
 
 			@Override

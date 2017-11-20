@@ -30,8 +30,9 @@ public class WinStats implements Comparable<WinStats> {
 	}
 	
 	public void add(WinResult result) {
-		if (result == null)
+		if (result == null) {
 			throw new NullPointerException("Result may not be null");
+		}
 		switch (result) {
 			case WIN:
 				wins++;
