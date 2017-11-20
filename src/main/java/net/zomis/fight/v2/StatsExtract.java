@@ -64,8 +64,10 @@ public class StatsExtract<Q> implements StatsInterface, StatsStore {
 
     private void finishCurrent() {
         if (knownIndexes.size() != indexes.length) {
-            throw new IllegalStateException("Missing indexes: " + Arrays.stream(this.indexes)
-                .filter(indexName -> !knownIndexes.containsKey(indexName)).collect(Collectors.toList()));
+            List<String> wantedButNotKnown = Arrays.stream(this.indexes)
+                    .filter(indexName -> !knownIndexes.containsKey(indexName)).collect(Collectors.toList());
+            throw new IllegalStateException(String.format("Unexpected indexes. Expected %s but found %s. Missing %s", Arrays.toString(indexes),
+                knownIndexes.keySet(), wantedButNotKnown));
         }
 
         for (Map.Entry<String, Map<Object, List<Object>>> valueSet : values.entrySet()) {
