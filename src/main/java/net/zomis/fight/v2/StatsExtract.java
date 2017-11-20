@@ -21,8 +21,28 @@ public class StatsExtract<Q> implements StatsInterface, StatsStore {
     private final Map<String, List<StatsDataExtract<Q, Object, Object>>> extractorsTuple = new HashMap<>();
     private Q current;
     private final Map<String, Collector<Object, ?, ?>> collectors = new HashMap<>();
+    private final Map<String, Collector<Object, ?, ?>> postCollectors = new HashMap<>();
     private IndexResults results = new IndexResults(0);
     private String[] indexes;
+
+    /**
+     * Define how a value is collected, and what to do with the value after each call to {@link #perform(StatsPerform, Object, int)}
+     * @param name Name of the value to collect
+     * @param valueType Type of the value that will be sent to {@link #save(String, Object, Object)}
+     * @param collector How to collect the values for each {@link #perform(StatsPerform, Object, int)}
+     * @param resultCollector How to collect the results after each {@link #perform(StatsPerform, Object, int)}
+     * @param <T> Type of value that will be collected
+     * @param <R> Result after first collection.
+     * @return
+     */
+    public <T, R> StatsExtract<Q> valueAndThen(String name, Class<T> valueType, Collector<T, ?, R> collector, Collector<R, ?, ?> resultCollector) {
+        if (this.collectors.containsKey(name)) {
+            throw new IllegalStateException("Collector for '" + name + "' already exists");
+        }
+        this.collectors.put(name, (Collector<Object, ?, ?>) collector);
+        this.postCollectors.put(name, (Collector<Object, ?, ?>) resultCollector);
+        return this;
+    }
 
     public <T> StatsExtract<Q> value(String name, Class<T> valueType, Collector<T, ?, ?> collector) {
         if (this.collectors.containsKey(name)) {
@@ -79,7 +99,13 @@ public class StatsExtract<Q> implements StatsInterface, StatsStore {
 
                 List<Object> currentIndexes = getIndexesFor(knownIndexes, key);
                 Collector<Object, ?, ?> collector = collectors.get(valueName);
-                this.results.addRecursive(valueName, collector, currentIndexes, objects);
+                Collector<Object, ?, ?> postCollector = postCollectors.get(valueName);
+                if (postCollector != null) {
+                    Object resultA = objects.stream().collect(collector);
+                    this.results.addRecursive(valueName, postCollector, currentIndexes, Collections.singletonList(resultA));
+                } else {
+                    this.results.addRecursive(valueName, collector, currentIndexes, objects);
+                }
                 objects.clear();
             }
         }
