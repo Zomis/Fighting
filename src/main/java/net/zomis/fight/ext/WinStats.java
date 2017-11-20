@@ -67,11 +67,31 @@ public class WinStats implements Comparable<WinStats> {
 		double drawsBonus = draws / 2.0;
 		return (wins + drawsBonus) / (double) getTotal();
 	}
-	
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		WinStats winStats = (WinStats) o;
+
+		if (wins != winStats.wins) return false;
+		if (losses != winStats.losses) return false;
+		return draws == winStats.draws;
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = wins;
+		result = 31 * result + losses;
+		result = 31 * result + draws;
+		return result;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("%d: %d/%d/%d (%.2f %%)", getTotal(), wins, draws, losses, getPercentage() * 100);
-//		return String.format("%d wins, %d draws, %d losses (%.2f %%)", wins, draws, losses, getPercentage() * 100);
 	}
 
 	@Override
