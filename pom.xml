@@ -19,7 +19,7 @@
     <repositories>
         <repository>
             <id>zomisnet</id>
-            <url>ftp://www.zomis.net/public_html/maven</url>
+            <url>http://www.zomis.net/maven</url>
         </repository>
     </repositories>
 
