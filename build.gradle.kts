@@ -17,6 +17,7 @@ repositories {
 dependencies {
     compile(kotlin("stdlib"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.1")
+    compile("org.slf4j:slf4j-api:1.7.25")
 }
 
 tasks.test {
