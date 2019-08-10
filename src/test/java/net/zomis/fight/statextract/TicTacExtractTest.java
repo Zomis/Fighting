@@ -6,9 +6,8 @@ import net.zomis.tttultimate.TTPlayer;
 import net.zomis.tttultimate.games.TTClassicController;
 import net.zomis.tttultimate.players.TTAI;
 import net.zomis.tttultimate.players.TTAIFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
 /**

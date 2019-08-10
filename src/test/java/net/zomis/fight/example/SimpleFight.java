@@ -5,8 +5,7 @@ import java.util.Random;
 import net.zomis.fight.FightInterface;
 import net.zomis.fight.FightResults;
 import net.zomis.fight.GameFight;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SimpleFight {
 	public static class Fighter {

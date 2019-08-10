@@ -1,14 +1,13 @@
 package net.zomis.fight.statextract;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.IntSummaryStatistics;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by Simon on 3/12/2015.

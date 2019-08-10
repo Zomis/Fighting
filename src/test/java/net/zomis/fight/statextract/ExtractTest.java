@@ -1,13 +1,14 @@
 package net.zomis.fight.statextract;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.IntSummaryStatistics;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created by Simon on 3/12/2015.
@@ -20,12 +21,14 @@ public class ExtractTest {
         ToIntFunction<Character> charValue = ch -> ch.charValue();
     }
 
-    @Test(expected = StackOverflowError.class)
+    @Test
     public void stackOverflow() {
         Extractor extractor = Extractor.extractor(new Example());
         extractor.addPreHandler(String.class, (extr, str) -> str.chars().mapToObj(i -> (char) i).forEach(ch -> extr.post(ch)));
         extractor.addPreHandler(Character.class, (extr, ch) -> extr.post("--" + ch));
-        extractor.postPrimary().post("test");
+        assertThrows(StackOverflowError.class, () -> {
+            extractor.postPrimary().post("test");
+        });
     }
 
     @Test

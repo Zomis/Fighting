@@ -12,12 +12,14 @@ version = myVersion
 
 repositories {
     jcenter()
+    maven(url = "http://stats.zomis.net/maven/snapshots")
 }
 
 dependencies {
     compile(kotlin("stdlib"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.1")
     compile("org.slf4j:slf4j-api:1.7.25")
+    compile("net.zomis:scorers:0.3.0-SNAPSHOT")
 }
 
 tasks.test {
