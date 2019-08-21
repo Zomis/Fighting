@@ -21,6 +21,13 @@ public enum WinResult {
 			return LOSS;
 		}
 	}
+
+	public static WinResult result(boolean draw, boolean win) {
+		if (draw) {
+			return WinResult.DRAW;
+		}
+		return win ? WinResult.WIN : WinResult.LOSS;
+	}
 	
 	public int winValueInt() {
 		switch (this) {

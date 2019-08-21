@@ -1,8 +1,23 @@
 package net.zomis.fights
 
-class FightResult {
+class FightResult<T>(private val callbacks: List<FightCallback<T>>) {
 
-
+    fun print() {
+        val allPlayers = callbacks.flatMap { it.players }.distinct()
+        for (player in allPlayers) {
+            val relevants = callbacks.filter { it.players.contains(player) }
+            val stats = relevants.map { it.results() }.map { it[player]!! }.reduce { a, b -> a.copyWith(b) }
+            println("$player: $stats")
+            for (opponent in allPlayers) {
+                if (opponent == player) {
+                    continue
+                }
+                val relevant = relevants.filter { it.players.contains(opponent) }
+                val statsVsOpponent = relevant.map { it.results() }.map { it[player]!! }.reduce { a, b -> a.copyWith(b) }
+                println("  vs. $opponent: $statsVsOpponent")
+            }
+        }
+    }
 
 }
 /*
